@@ -1,17 +1,32 @@
 import React from 'react'
 import MovieCard from '../components/MovieCard'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { searchMovies, getPopularMovies } from '../services/api'
 import "../css/Home.css"
 
 const Home = () => {
 
     const [searchQuery, setSearchQuery] = useState("");
+    const [movies, setMovies] = useState([]);
+    const [erros, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    const movies = [
-        {id: 1, title: "Jonh Wick", release_date: "2010"},
-        {id: 2, title: "ranh", release_date: "2020"},
-        {id: 3, title: "fonhWick", release_date: "2000"},
-    ]
+    // só corre uma vez
+    useEffect(() => {
+        const loadPopularMovies = async () => {
+            try {
+                const popularMovies = await getPopularMovies();
+                setMovies(popularMovies);
+            } catch (err) {
+                console.log(err);
+                setError("Failed to load movies...");
+            }
+            finally {
+                setLoading(false);
+            }
+        }
+        loadPopularMovies();
+    }, [])
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -33,6 +48,7 @@ const Home = () => {
         </form>
 
         <div className="movies-grid">
+            {console.log(movies)}
             {movies.map(
                 (movie) =>
                 (
